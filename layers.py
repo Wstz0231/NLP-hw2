@@ -96,7 +96,7 @@ def attention(query, key, value, mask=None, dropout=None):
     qkt = torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(d_k)
     if mask is not None:
         # for (N, Lk)
-        if mask.dim() == 2:
+        if mask.dim() < query.dim():
             mask = mask.unsqueeze(1)
         qkt = qkt.masked_fill(mask==0, -1e9)
     attn_weights = qkt.softmax(dim=-1)
@@ -146,8 +146,6 @@ class MultiHeadedAttention(nn.Module):
         ################################
         ################################
         bs = query.size(0)
-        if mask is not None:
-            mask = mask.unsqueeze(1)
         # 4th layer for final
         # (N, h, l, dk)
         q, k, v = [lin(x).view(bs, -1, self.h, self.d_k).transpose(1, 2) for lin, x in zip(self.linears, (query, key, value))]
