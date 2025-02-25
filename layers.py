@@ -146,6 +146,8 @@ class MultiHeadedAttention(nn.Module):
         ################################
         ################################
         bs = query.size(0)
+        if mask is not None:
+            mask = mask.unsqueeze(1)
         # 4th layer for final
         # (N, h, l, dk)
         q, k, v = [lin(x).view(bs, -1, self.h, self.d_k).transpose(1, 2) for lin, x in zip(self.linears, (query, key, value))]
