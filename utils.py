@@ -160,9 +160,15 @@ def beam_search_decode(model, src, src_mask, max_len, start_symbol, beam_size, e
         ### YOUR CODE GOES HERE ########
         ################################
         ################################
-        
-        
-        raise NotImplementedError
+        log_prob = prob + scores.unsqueeze(-1)
+        # top k
+        log_prob = log_prob.view(-1)
+        scores, ind = log_prob.topk(beam_size, dim=0)
+        # find respective sequence and next tok
+        seq_indices = ind // vocab_size
+        tok_indices = ind % vocab_size
+        # update sequence with next tok
+        ys = torch.cat([ys[seq_indices], tok_indices.unsqueeze(1)], dim=1)
         
         
         ### YOUR CODE ENDS HERE #######
